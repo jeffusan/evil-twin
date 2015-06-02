@@ -8,16 +8,17 @@
 This is my emacs configuration in org-babel.
 It is converted to init.el the first time it is loaded, using tangle.
 
-To use this, you can...
+To use this, you can... M-x org-babel-load-file
 
 ** TODOs
 - [ ] comb through purcell emacs and take out the good parts
-- [ ] configure and auto-start a decent theme
+- [X] configure and auto-start a decent theme
 - [ ] my org-mode config
 - [ ] ensime
 - [ ] cider
 - [ ] get my old shortcuts to work
-- [ ] get osx alt key to work
+- [X] get osx alt key to work
+- [ ] find a better font
 
 ** Utilities
 I've added some utility functions that can be called via META-x:
@@ -27,9 +28,6 @@ I've added some utility functions that can be called via META-x:
   A shortcut to rename and save: both the current buffer and the file it's visiting.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-
-
-
 ;;----------------------------------------------------------------------------
 ;; Delete the current file
 ;;----------------------------------------------------------------------------
@@ -59,6 +57,15 @@ I've added some utility functions that can be called via META-x:
          (rename-file filename new-name 1))
         (rename-buffer new-name)
         (set-visited-file-name new-name)))))
+
+;;------------------
+;; Reload org config
+;;------------------
+(global-set-key (kbd "M-p") 
+  (lambda () 
+    (interactive) 
+    (org-babel-load-file "~/.emacs.d/init.org")))
+
 #+END_SRC
 
 ** Package Management
@@ -108,17 +115,33 @@ Default configuration settings.
 #+BEGIN_SRC emacs-lisp :tangle yes
 (fset 'yes-or-no-p 'y-or-n-p) ;; only `y` instead of `yes`
 (setq inhibit-splash-screen t) ;; no splash screen
-(if window-system
-(progn
-(set-frame-font "Anonymous Pro-12"))) ;; change default font
 (desktop-save-mode 1) ;; auto-save buffer state on close for next time.
+
+(require 'ansi-color)
+(setq scroll-bar-mode nil)
+(setq-default custom-enabled-themes '(pastels-on-dark-theme))
+
+
+#+END_SRC
+
+*** Ido configuration settings
+
+#+BEGIN_SRC emacs-lisp :tangle yes
 (ido-mode t)
-(flx-ido-mode t)
 (setq ido-enable-flex-matching t)
 (setq ido-use-faces nil)
 
-(require 'ansi-color)
+#+END_SRC
 
-(setq-default custom-enabled-themes '(pastels-on-dark-theme))
+*** Font work
+TBD
+
+** OSX configuration
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(setq mac-command-modifier 'meta)
+(setq mac-option-modifier 'none)
+(setq default-input-method "MacOSX")
 
 #+END_SRC
+
