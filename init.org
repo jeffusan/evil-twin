@@ -1,0 +1,124 @@
+#+title: My Emacs Configuration
+#+AUTHOR: Jeff Hemminger
+#+EMAIL: jeff@kropek.org
+#+STARTUP: indent
+#+LANGUAGE: en
+#+BABEL: :cache yes
+* My emacs config, written in org-babel for emacs.
+This is my emacs configuration in org-babel.
+It is converted to init.el the first time it is loaded, using tangle.
+
+To use this, you can...
+
+** TODOs
+- [ ] comb through purcell emacs and take out the good parts
+- [ ] configure and auto-start a decent theme
+- [ ] my org-mode config
+- [ ] ensime
+- [ ] cider
+- [ ] get my old shortcuts to work
+- [ ] get osx alt key to work
+
+** Utilities
+I've added some utility functions that can be called via META-x:
+- delete this file
+  This is a shortcut to delete the current buffer and kill it.
+- Rename the current file
+  A shortcut to rename and save: both the current buffer and the file it's visiting.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+
+
+
+;;----------------------------------------------------------------------------
+;; Delete the current file
+;;----------------------------------------------------------------------------
+(defun delete-this-file ()
+  "Delete the current file, and kill the buffer."
+  (interactive)
+  (or (buffer-file-name) (error "No file is currently being edited"))
+  (when (yes-or-no-p (format "Really delete '%s'?"
+                             (file-name-nondirectory buffer-file-name)))
+    (delete-file (buffer-file-name))
+    (kill-this-buffer)))
+
+;;----------------------------------------------------------------------------
+;; Rename the current file
+;;----------------------------------------------------------------------------
+(defun rename-this-file-and-buffer (new-name)
+  "Renames both current buffer and file it's visiting to NEW-NAME."
+  (interactive "sNew name: ")
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (unless filename
+      (error "Buffer '%s' is not visiting a file!" name))
+    (if (get-buffer new-name)
+        (message "A buffer named '%s' already exists!" new-name)
+      (progn
+        (when (file-exists-p filename)
+         (rename-file filename new-name 1))
+        (rename-buffer new-name)
+        (set-visited-file-name new-name)))))
+#+END_SRC
+
+** Package Management
+
+Add package management repositories
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(require 'package)
+(add-to-list 'package-archives
+	     '("marmalade" . "http://marmalade-repo.org/packages/"))
+(add-to-list 'package-archives
+	     '("melpa" . "http://melpa.milkbox.net/packages/"))
+(add-to-list 'package-archives
+         '("melpa-stable" . "http://stable.melpa.org/packages/"))
+
+(package-initialize)
+#+END_SRC
+
+This is from justinabrahams - 
+Get an up-to-date list of packages if a cached copy does not exist.
+Loop over the list of packages and install them.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(when (not package-archive-contents)
+(package-refresh-contents))
+
+(defvar my-packages
+'(
+magit
+org
+rainbow-delimiters
+pastels-on-dark-theme
+dired-single
+dired+
+js2-mode)
+"A list of packages to be installed at launch.")
+
+(dolist (p my-packages)
+(when (not (package-installed-p p))
+(package-install p)))
+
+#+END_SRC
+
+** Basic configuration
+Default configuration settings.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(fset 'yes-or-no-p 'y-or-n-p) ;; only `y` instead of `yes`
+(setq inhibit-splash-screen t) ;; no splash screen
+(if window-system
+(progn
+(set-frame-font "Anonymous Pro-12"))) ;; change default font
+(desktop-save-mode 1) ;; auto-save buffer state on close for next time.
+(ido-mode t)
+(flx-ido-mode t)
+(setq ido-enable-flex-matching t)
+(setq ido-use-faces nil)
+
+(require 'ansi-color)
+
+(setq-default custom-enabled-themes '(pastels-on-dark-theme))
+
+#+END_SRC
