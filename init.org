@@ -11,9 +11,9 @@ It is converted to init.el the first time it is loaded, using tangle.
 To use this, you can... M-x org-babel-load-file
 
 ** TODOs
-- [ ] comb through purcell emacs and take out the good parts
+- [X] comb through purcell emacs and take out the good parts
 - [X] configure and auto-start a decent theme
-- [ ] my org-mode config
+- [X] my org-mode config
 - [ ] ensime
 - [ ] figure out how to use emmet mode
 - [ ] cider
@@ -27,7 +27,10 @@ To use this, you can... M-x org-babel-load-file
 - [ ] review hippie-expand
 - [ ] review purcell init-editing-utils
 - [ ] figure out why you can't load flycheck
-
+- [ ] automate desktop setup
+- [ ] figure out the ibuffer warning on load
+- [ ] why doesn't the start.el work? is it needed?
+- [ ] write some actual documentation for the love of god
 ** Utilities
 I've added some utility functions that can be called via META-x:
 - delete this file
@@ -74,6 +77,18 @@ I've added some utility functions that can be called via META-x:
     (interactive) 
     (org-babel-load-file "~/.emacs.d/init.org")))
 
+(defun require-package (package &optional min-version no-refresh)
+  "Install given PACKAGE, optionally requiring MIN-VERSION.
+If NO-REFRESH is non-nil, the available package lists will not be
+re-downloaded in order to locate PACKAGE."
+  (if (package-installed-p package min-version)
+      t
+    (if (or (assoc package package-archive-contents) no-refresh)
+        (package-install package)
+      (progn
+        (package-refresh-contents)
+        (require-package package min-version t)))))
+
 #+END_SRC
 
 ** Package Management
@@ -82,11 +97,11 @@ Add package management repositories
 
 #+BEGIN_SRC emacs-lisp :tangle yes
 (require 'package)
-(add-to-list 'package-archives
-	     '("melpa" . "http://melpa.milkbox.net/packages/"))
-(add-to-list 'package-archives
-         '("melpa-stable" . "http://stable.melpa.org/packages/"))
-
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+(add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
+;;; Also use Melpa for most packages
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
 (package-initialize)
 #+END_SRC
 
@@ -100,18 +115,11 @@ Loop over the list of packages and install them.
 
 (defvar my-packages
 '(
-elisp-slime-nav
+auto-complete
 magit
-auto-compile
-aggressive-indent
-cl-lib-highlight
-macrostep
-hl-sexp
-redshank
+highlight-quoted
 org
 rainbow-delimiters
-lively
-ipretty
 paredit-everywhere
 pastels-on-dark-theme
 afternoon-theme
@@ -150,7 +158,9 @@ markdown-mode
 csv-nav
 json-mode
 ac-js2
+idomenu
 coffee-mode
+osx-location
 js-comint
 paredit)
 "A list of packages to be installed at launch.")
@@ -260,6 +270,7 @@ function under your cursor takes, which can be a helpful for jogging
 your memory.
 
 #+begin_src emacs-lisp :tangle yes
+(require 'paredit)
 (autoload 'enable-paredit-mode "paredit")
 (eval-after-load 'paredit
   ;; need a binding that works in the terminal
@@ -270,7 +281,7 @@ your memory.
     (local-set-key (kbd "RET") 'paredit-newline)))
 
 (add-hook 'paredit-mode-hook 'maybe-map-paredit-newline)
-(diminish 'paredit-mode " Par")
+
 (dolist (binding (list (kbd "C-<left>") (kbd "C-<right>")
                          (kbd "C-M-<left>") (kbd "C-M-<right>")))
   (define-key paredit-mode-map binding nil))
@@ -315,8 +326,8 @@ your memory.
 (add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
 (add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
 (add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
-
-#+end_src
+(diminish 'paredit-mode " Par")
+#+END_SRC
 ** iSearch
 anzu mode
 #+BEGIN_SRC emacs-lisp :tangle yes
@@ -465,28 +476,30 @@ mostly purchell's autocomplete
 (setq tab-always-indent 'complete)
 (add-to-list 'completion-styles 'initials t)
 ;; Stop completion-at-point from popping up completion buffers so eagerly
-;;(setq completion-cycle-threshold 5)
-;;(add-hook 'auto-complete-mode-hook 'set-auto-complete-as-completion-at-point-function)
+(setq completion-cycle-threshold 5)
+(add-hook 'auto-complete-mode-hook 'set-auto-complete-as-completion-at-point-function)
+(defun set-auto-complete-as-completion-at-point-function ()
+  (setq completion-at-point-functions
+        (cons 'sanityinc/auto-complete-at-point
+              (remove 'sanityinc/auto-complete-at-point completion-at-point-functions))))
 
+(set-default 'ac-sources
+             '(ac-source-imenu
+               ac-source-dictionary
+               ac-source-words-in-buffer
+               ac-source-words-in-same-mode-buffers
+               ac-source-words-in-all-buffer))
 
-;;(set-default 'ac-sources
-;;             '(ac-source-imenu
-;;               ac-source-dictionary
-;;              ac-source-words-in-buffer
-;;               ac-source-words-in-same-mode-buffers
-;;               ac-source-words-in-all-buffer))
-
-;;(dolist (mode '(magit-log-edit-mode
-;;                log-edit-mode org-mode text-mode haml-mode
-;;                git-commit-mode
-;;                sass-mode yaml-mode csv-mode espresso-mode haskell-mode
-;;                html-mode nxml-mode sh-mode smarty-mode clojure-mode
-;;                lisp-mode textile-mode markdown-mode tuareg-mode
-;;                js3-mode css-mode less-css-mode sql-mode
-;;                sql-interactive-mode
-;;                inferior-emacs-lisp-mode))
-;;  (add-to-list 'ac-modes mode))
-
+(dolist (mode '(magit-log-edit-mode
+                log-edit-mode org-mode text-mode haml-mode
+                git-commit-mode
+                sass-mode yaml-mode csv-mode espresso-mode haskell-mode
+                html-mode nxml-mode sh-mode smarty-mode clojure-mode
+                lisp-mode textile-mode markdown-mode tuareg-mode
+                js3-mode css-mode less-css-mode sql-mode
+                sql-interactive-mode
+                inferior-emacs-lisp-mode))
+(add-to-list 'ac-modes mode))
 #+END_SRC
 ** Windows
 windowing configuration
@@ -714,267 +727,92 @@ sql mode config
 #+END_SRC
 
 
-** lisp config
-purcell lisp config
+** server
+allow access from emacsclient
 #+BEGIN_SRC emacs-lisp :tangle yes
-(require 'elisp-slime-nav)
-(dolist (hook '(emacs-lisp-mode-hook ielm-mode-hook))
-  (add-hook hook 'elisp-slime-nav-mode))
+(require 'server)
+(unless (server-running-p)
+  (server-start))
+#+END_SRC
+** sessions
+configure desktop sessions
+save a list of open files in ~/.emacs.d/.emacs.desktop
+#+BEGIN_SRC emacs-lisp :tangle yes
 
-(require 'lively)
-
-(setq-default initial-scratch-message
-      (concat ";; Happy hacking " (or user-login-name "") " - Emacs ♥ you!\n\n"))
-
-;; Make C-x C-e run 'eval-region if the region is active
-(defun sanityinc/eval-last-sexp-or-region (prefix)
-  "Eval region from BEG to END if active, otherwise the last sexp."
-  (interactive "P")
-  (if (and (mark) (use-region-p))
-      (eval-region (min (point) (mark)) (max (point) (mark)))
-    (pp-eval-last-sexp prefix)))
-
-(global-set-key (kbd "M-:") 'pp-eval-expression)
-
-(define-key emacs-lisp-mode-map (kbd "C-x C-e") 'sanityinc/eval-last-sexp-or-region)
-
-(require 'ipretty)
-(ipretty-mode 1)
-
-(defadvice pp-display-expression (after make-read-only (expression out-buffer-name) activate)
-  "Enable `view-mode' in the output buffer - if any - so it can be closed with `\"q\"."
-  (when (get-buffer out-buffer-name)
-    (with-current-buffer out-buffer-name
-      (view-mode 1))))
-
-;; Use C-c C-z to toggle between elisp files and an ielm session
-;; I might generalise this to ruby etc., or even just adopt the repl-toggle package.
-
-(defvar sanityinc/repl-original-buffer nil
-  "Buffer from which we jumped to this REPL.")
-(make-variable-buffer-local 'sanityinc/repl-original-buffer)
-
-(defvar sanityinc/repl-switch-function 'switch-to-buffer-other-window)
-
-(defun sanityinc/switch-to-ielm ()
-  (interactive)
-  (let ((orig-buffer (current-buffer)))
-    (if (get-buffer "*ielm*")
-        (funcall sanityinc/repl-switch-function "*ielm*")
-      (ielm))
-    (setq sanityinc/repl-original-buffer orig-buffer)))
-
-(defun sanityinc/repl-switch-back ()
-  "Switch back to the buffer from which we reached this REPL."
-  (interactive)
-  (if sanityinc/repl-original-buffer
-      (funcall sanityinc/repl-switch-function sanityinc/repl-original-buffer)
-    (error "No original buffer.")))
-
-(define-key emacs-lisp-mode-map (kbd "C-c C-z") 'sanityinc/switch-to-ielm)
-
-;; ----------------------------------------------------------------------------
-;; Hippie-expand
-;; ----------------------------------------------------------------------------
-
-(defun my/emacs-lisp-module-name ()
-  "Search the buffer for `provide' declaration."
-  (save-excursion
-    (goto-char (point-min))
-    (when (search-forward-regexp "^(provide '" nil t)
-      (symbol-name (symbol-at-point)))))
-
-;; Credit to Chris Done for this one.
-(defun my/try-complete-lisp-symbol-without-namespace (old)
-  "Hippie expand \"try\" function which expands \"-foo\" to \"modname-foo\" in elisp."
-  (unless old
-    (he-init-string (he-lisp-symbol-beg) (point))
-    (when (string-prefix-p "-" he-search-string)
-      (let ((mod-name (my/emacs-lisp-module-name)))
-        (when mod-name
-          (setq he-expand-list (list (concat mod-name he-search-string)))))))
-  (when he-expand-list
-    (he-substitute-string (car he-expand-list))
-    (setq he-expand-list nil)
-    t))
-
-(defun set-up-hippie-expand-for-elisp ()
-  "Locally set `hippie-expand' completion functions for use with Emacs Lisp."
-  (make-local-variable 'hippie-expand-try-functions-list)
-  (add-to-list 'hippie-expand-try-functions-list 'try-complete-lisp-symbol t)
-  (add-to-list 'hippie-expand-try-functions-list 'try-complete-lisp-symbol-partially t)
-  (add-to-list 'hippie-expand-try-functions-list 'my/try-complete-lisp-symbol-without-namespace t))
-
-
-;; ----------------------------------------------------------------------------
-;; Automatic byte compilation
-;; ----------------------------------------------------------------------------
-
-(require 'auto-compile)
-(auto-compile-on-save-mode 1)
-(auto-compile-on-load-mode 1)
-
-;; ----------------------------------------------------------------------------
-;; Load .el if newer than corresponding .elc
-;; ----------------------------------------------------------------------------
-(setq load-prefer-newer t)
-
-;; ----------------------------------------------------------------------------
-;; Highlight current sexp
-;; ----------------------------------------------------------------------------
-
-(require 'hl-sexp)
-
-;; Prevent flickery behaviour due to hl-sexp-mode unhighlighting before each command
-(defadvice hl-sexp-mode (after unflicker (&optional turn-on) activate)
-   (when turn-on
-      (remove-hook 'pre-command-hook #'hl-sexp-unhighlight)))
-
-;;; Support byte-compilation in a sub-process, as
-;;; required by highlight-cl
-
-(defun sanityinc/byte-compile-file-batch (filename)
-  "Byte-compile FILENAME in batch mode, ie. a clean sub-process."
-  (interactive "fFile to byte-compile in batch mode: ")
-  (let ((emacs (car command-line-args)))
-    (compile
-     (concat
-      emacs " "
-      (mapconcat
-       'shell-quote-argument
-       (list "-Q" "-batch" "-f" "batch-byte-compile" filename)
-       " ")))))
-
-;; ----------------------------------------------------------------------------
-;; Enable desired features for all lisp modes
-;; ----------------------------------------------------------------------------
-(require 'rainbow-delimiters)
-(require 'redshank)
-(diminish 'redshank-mode)
-
-(require 'aggressive-indent)
-
-(defun sanityinc/lisp-setup ()
-  "Enable features useful in any Lisp mode."
-  (rainbow-delimiters-mode t)
-  (enable-paredit-mode)
-  (when (fboundp 'aggressive-indent-mode)
-    (aggressive-indent-mode))
-  (turn-on-eldoc-mode)
-  (redshank-mode)
-  (add-hook 'after-save-hook #'check-parens nil t))
-
-(defun sanityinc/emacs-lisp-setup ()
-  "Enable features useful when working with elisp."
-  (elisp-slime-nav-mode t)
-  (set-up-hippie-expand-for-elisp)
-  (ac-emacs-lisp-mode-setup))
-
-(defconst sanityinc/elispy-modes
-  '(emacs-lisp-mode ielm-mode)
-  "Major modes relating to elisp.")
-
-(defconst sanityinc/lispy-modes
-  (append sanityinc/elispy-modes
-          '(lisp-mode inferior-lisp-mode lisp-interaction-mode))
-  "All lispy major modes.")
-
-(require 'derived)
-
-(dolist (hook (mapcar #'derived-mode-hook-name sanityinc/lispy-modes))
-  (add-hook hook 'sanityinc/lisp-setup))
-
-(dolist (hook (mapcar #'derived-mode-hook-name sanityinc/elispy-modes))
-  (add-hook hook 'sanityinc/emacs-lisp-setup))
-
-(if (boundp 'eval-expression-minibuffer-setup-hook)
-    (add-hook 'eval-expression-minibuffer-setup-hook #'eldoc-mode)
-  (require 'eldoc-eval)
-  (require 'eldoc-eval)
-  (eldoc-in-minibuffer-mode 1))
-
-(add-to-list 'auto-mode-alist '("\\.emacs-project\\'" . emacs-lisp-mode))
-(add-to-list 'auto-mode-alist '("archive-contents\\'" . emacs-lisp-mode))
-
-(require 'cl-lib-highlight)
-(cl-lib-highlight-initialize)
-
-;; ----------------------------------------------------------------------------
-;; Delete .elc files when reverting the .el from VC or magit
-;; ----------------------------------------------------------------------------
-
-;; When .el files are open, we can intercept when they are modified
-;; by VC or magit in order to remove .elc files that are likely to
-;; be out of sync.
-
-;; This is handy while actively working on elisp files, though
-;; obviously it doesn't ensure that unopened files will also have
-;; their .elc counterparts removed - VC hooks would be necessary for
-;; that.
-
-(defvar sanityinc/vc-reverting nil
-  "Whether or not VC or Magit is currently reverting buffers.")
-
-(defadvice revert-buffer (after sanityinc/maybe-remove-elc activate)
-  "If reverting from VC, delete any .elc file that will now be out of sync."
-  (when sanityinc/vc-reverting
-    (when (and (eq 'emacs-lisp-mode major-mode)
-               buffer-file-name
-               (string= "el" (file-name-extension buffer-file-name)))
-      (let ((elc (concat buffer-file-name "c")))
-        (when (file-exists-p elc)
-          (message "Removing out-of-sync elc file %s" (file-name-nondirectory elc))
-          (delete-file elc))))))
-
-(defadvice magit-revert-buffers (around sanityinc/reverting activate)
-  (let ((sanityinc/vc-reverting t))
-    ad-do-it))
-(defadvice vc-revert-buffer-internal (around sanityinc/reverting activate)
-  (let ((sanityinc/vc-reverting t))
+(setq desktop-path (list user-emacs-directory)
+      desktop-auto-save-timeout 600)
+(desktop-save-mode 1)
+(defadvice desktop-read (around trace-desktop-errors activate)
+  (let ((debug-on-error t))
     ad-do-it))
 
-(require 'macrostep)
+(defadvice desktop-read (around time-restore activate)
+    (let ((start-time (current-time)))
+      (prog1
+          ad-do-it
+        (message "Desktop restored in %.2fms"
+                 (sanityinc/time-subtract-millis (current-time)
+                                                 start-time)))))
 
-(define-key emacs-lisp-mode-map (kbd "C-c e") 'macrostep-expand)
+(defadvice desktop-create-buffer (around time-create activate)
+  (let ((start-time (current-time))
+        (filename (ad-get-arg 1)))
+    (prog1
+        ad-do-it
+      (message "Desktop: %.2fms to restore %s"
+               (sanityinc/time-subtract-millis (current-time)
+                                               start-time)
+               (when filename
+		 (abbreviate-file-name filename))))))
 
-;; A quick way to jump to the definition of a function given its key binding
-(global-set-key (kbd "C-h K") 'find-function-on-key)
+;;----------------------------------------------------------------------------
+;; Restore histories and registers after saving
+;;----------------------------------------------------------------------------
+(setq-default history-length 1000)
+(savehist-mode t)
 
-(defun sanityinc/enable-rainbow-mode-if-theme ()
-  (when (string-match "\\(color-theme-\\|-theme\\.el\\)" (buffer-name))
-    (rainbow-mode 1)))
+(require-package 'session)
 
-(add-hook 'emacs-lisp-mode-hook 'sanityinc/enable-rainbow-mode-if-theme)
+(setq session-save-file (expand-file-name ".session" user-emacs-directory))
+(add-hook 'after-init-hook 'session-initialize)
 
-(add-hook 'emacs-lisp-mode-hook 'highlight-quoted-mode)
+;; save a bunch of variables to the desktop file
+;; for lists specify the len of the maximal saved data also
+(setq desktop-globals-to-save
+      (append '((comint-input-ring        . 50)
+                (compile-history          . 30)
+                desktop-missing-file-warning
+                (dired-regexp-history     . 20)
+                (extended-command-history . 30)
+                (face-name-history        . 20)
+                (file-name-history        . 100)
+                (grep-find-history        . 30)
+                (grep-history             . 30)
+                (ido-buffer-history       . 100)
+                (ido-last-directory-list  . 100)
+                (ido-work-directory-list  . 100)
+                (ido-work-file-list       . 100)
+                (magit-read-rev-history   . 50)
+                (minibuffer-history       . 50)
+                (org-clock-history        . 50)
+                (org-refile-history       . 50)
+                (org-tags-history         . 50)
+                (query-replace-history    . 60)
+                (read-expression-history  . 60)
+                (regexp-history           . 60)
+                (regexp-search-ring       . 20)
+                register-alist
+                (search-ring              . 20)
+                (shell-command-history    . 50)
+                tags-file-name
+                tags-table-list)))
 
-;; ERT
-(define-key ert-results-mode-map (kbd "g") 'ert-results-rerun-all-tests)
-
-(defun sanityinc/cl-libify-next ()
-  "Find next symbol from 'cl and replace it with the 'cl-lib equivalent."
-  (interactive)
-  (let ((case-fold-search nil))
-    (re-search-forward
-     (concat
-      "("
-      (regexp-opt
-       ;; Not an exhaustive list
-       '("loop" "incf" "plusp" "first" "decf" "minusp" "assert"
-         "case" "destructuring-bind" "second" "third" "defun*"
-         "defmacro*" "return-from" "labels" "cadar" "fourth"
-         "cadadr") t)
-      "\\_>")))
-  (let ((form (match-string 1)))
-    (backward-sexp)
-    (cond
-     ((string-match "^\\(defun\\|defmacro\\)\\*$")
-      (kill-sexp)
-      (insert (concat "cl-" (match-string 1))))
-     (t
-      (insert "cl-")))
-    (when (fboundp 'aggressive-indent-indent-defun)
-      (aggressive-indent-indent-defun))))
+(when (eval-when-compile (and (>= emacs-major-version 24)
+                              (version< emacs-version "24.3.50")
+                              ))
+  (unless (boundp 'desktop-restore-frames)
+    (require-package 'frame-restore)
+    (frame-restore)))
 
 
 #+END_SRC

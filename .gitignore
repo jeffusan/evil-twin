@@ -5,3 +5,7 @@ auto-save-list/
 elpa/
 ido.last
 init.el
+.smex-items
+ac-comphist.dat
+history
+recentf
