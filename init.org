@@ -15,10 +15,15 @@ To use this, you can... M-x org-babel-load-file
 - [X] configure and auto-start a decent theme
 - [ ] my org-mode config
 - [ ] ensime
+- [ ] figure out how to use emmet mode
 - [ ] cider
-- [ ] get my old shortcuts to work
+- [X] get my old shortcuts to work
 - [X] get osx alt key to work
 - [ ] find a better font
+- [ ] review to understand the search functionality
+- [ ] review ibuffer settings
+- [ ] review hippie-expand
+- [ ] review purcell init-editing-utils
 
 ** Utilities
 I've added some utility functions that can be called via META-x:
@@ -98,9 +103,43 @@ magit
 org
 rainbow-delimiters
 pastels-on-dark-theme
+afternoon-theme
+ahungry-theme
+alect-themes
 dired-single
 dired+
-js2-mode)
+dired-sort
+js2-mode
+anzu
+diminish
+fullframe
+python-mode
+emmet-mode
+ibuffer-git
+ibuffer-vc
+smex
+ido-ubiquitous
+switch-window
+default-text-scale
+mmm-mode
+git-blame
+gitignore-mode
+gitconfig-mode
+git-messenger
+git-timemachine
+github-browse-file
+yagist
+github-browse-file
+bug-reference-github
+github-clone
+magit-gh-pulls
+markdown-mode
+csv-nav
+json-mode
+ac-js2
+coffee-mode
+js-comint
+paredit)
 "A list of packages to be installed at launch.")
 
 (dolist (p my-packages)
@@ -110,27 +149,69 @@ js2-mode)
 #+END_SRC
 
 ** Basic configuration
-Default configuration settings.
+Default configuration settings. Other things that don't really deserve a heading of their own.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
 (fset 'yes-or-no-p 'y-or-n-p) ;; only `y` instead of `yes`
-(setq inhibit-splash-screen t) ;; no splash screen
 (desktop-save-mode 1) ;; auto-save buffer state on close for next time.
-
-(require 'ansi-color)
 (setq scroll-bar-mode nil)
-(setq-default custom-enabled-themes '(pastels-on-dark-theme))
+(require 'uniquify)
+(setq uniquify-buffer-name-style 'post-forward) ;; buffernames like foo|dir foo|otherdir
+;; colorize the output of the compilation mode.
+(require 'ansi-color)
+(defun colorize-compilation-buffer ()
+  (toggle-read-only)
+  (ansi-color-apply-on-region (point-min) (point-max))
 
+  ;; mocha seems to output some non-standard control characters that
+  ;; aren't recognized by ansi-color-apply-on-region, so we'll
+  ;; manually convert these into the newlines they should be.
+  (goto-char (point-min))
+  (while (re-search-forward "\\[2K\\[0G" nil t)
+    (progn
+      (replace-match "
+")))
+  (toggle-read-only))
+(add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
+(load-theme 'wombat t)
+(add-hook 'after-init-hook 'global-flycheck-mode)
+(global-set-key (kbd "M-/") 'hippie-expand)
+
+(setq hippie-expand-try-functions-list
+      '(try-complete-file-name-partially
+        try-complete-file-name
+        try-expand-dabbrev
+        try-expand-dabbrev-all-buffers
+        try-expand-dabbrev-from-kill))
+(require 'markdown-mode)
+(setq auto-mode-alist
+      (cons '("\\.\\(md\\|markdown\\)\\'" . markdown-mode) auto-mode-alist))
+
+(require 'csv-nav)
+
+(setq csv-separators '("," ";" "|" " "))
 
 #+END_SRC
 
 *** Ido configuration settings
 
 #+BEGIN_SRC emacs-lisp :tangle yes
+(require 'smex)
+(require 'ido-ubiquitous)
+(require 'idomenu)
 (ido-mode t)
+(ido-everywhere t)
 (setq ido-enable-flex-matching t)
-(setq ido-use-faces nil)
-
+(setq ido-use-filename-at-point nil)
+(setq ido-auto-merge-work-directories-length 0)
+(setq ido-use-virtual-buffers t)
+(setq ido-ubiquitous-mode t)
+(setq smex-save-file (expand-file-name ".smex-items" user-emacs-directory))
+(global-set-key [remap execute-extended-command] 'smex)
+(setq ido-default-buffer-method 'selected-window)
+;; http://www.reddit.com/r/emacs/comments/21a4p9/use_recentf_and_ido_together/cgbprem
+(add-hook 'ido-setup-hook (lambda () (define-key ido-completion-map [up] 'previous-history-element)))
+(setq ido-use-faces nil)  ;; use flx highlights instead
 #+END_SRC
 
 *** Font work
@@ -145,3 +226,402 @@ TBD
 
 #+END_SRC
 
+** GUI Feature
+Mostly disabling things I don't want or need
+#+BEGIN_SRC emacs-lisp :tangle yes
+(setq use-file-dialog nil)
+(setq use-dialog-box nil)
+(setq inhibit-startup-screen t)
+(setq inhibit-splash-screen t) ;; no splash screen
+(setq inhibit-startup-message t)
+(setq inhibit-startup-echo-area-message t)
+(tool-bar-mode -1)
+(set-scroll-bar-mode nil)
+
+#+END_SRC
+** Lisp
+Straight-up justinabrahams lisp config
+...
+eldoc mode is will update your minibuffer to show the parameters the
+function under your cursor takes, which can be a helpful for jogging
+your memory.
+
+#+begin_src emacs-lisp :tangle yes
+(eval-after-load 'paredit
+  ;; need a binding that works in the terminal
+  '(define-key paredit-mode-map (kbd "M-)") 'paredit-forward-slurp-sexp))
+
+(show-paren-mode 1)  ;; highlight matching parenthasis
+(add-hook 'emacs-lisp-mode-hook 'paredit-mode)
+
+;; nifty documentation at point for lisp files
+(add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
+(add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
+(add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
+
+#+end_src
+** iSearch
+anzu mode
+#+BEGIN_SRC emacs-lisp :tangle yes
+(global-anzu-mode t)
+(diminish 'anzu-mode)
+(global-set-key [remap query-replace-regexp] 'anzu-query-replace-regexp)
+(global-set-key [remap query-replace] 'anzu-query-replace)
+;; Activate occur easily inside isearch
+(define-key isearch-mode-map (kbd "C-o") 'isearch-occur)
+;; DEL during isearch should edit the search string, not jump back to the previous result
+(define-key isearch-mode-map [remap isearch-delete-char] 'isearch-del-char)
+;; Search back/forth for the symbol at point
+;; See http://www.emacswiki.org/emacs/SearchAtPoint
+(defun isearch-yank-symbol ()
+  "*Put symbol at current point into search string."
+  (interactive)
+  (let ((sym (symbol-at-point)))
+    (if sym
+        (progn
+          (setq isearch-regexp t
+                isearch-string (concat "\\_<" (regexp-quote (symbol-name sym)) "\\_>")
+                isearch-message (mapconcat 'isearch-text-char-description isearch-string "")
+                isearch-yank-flag t))
+      (ding)))
+  (isearch-search-and-update))
+
+(define-key isearch-mode-map "\C-\M-w" 'isearch-yank-symbol)
+;; http://www.emacswiki.org/emacs/ZapToISearch
+(defun zap-to-isearch (rbeg rend)
+  "Kill the region between the mark and the closest portion of
+the isearch match string. The behaviour is meant to be analogous
+to zap-to-char; let's call it zap-to-isearch. The deleted region
+does not include the isearch word. This is meant to be bound only
+in isearch mode.  The point of this function is that oftentimes
+you want to delete some portion of text, one end of which happens
+to be an active isearch word. The observation to make is that if
+you use isearch a lot to move the cursor around (as you should,
+it is much more efficient than using the arrows), it happens a
+lot that you could just delete the active region between the mark
+and the point, not include the isearch word."
+  (interactive "r")
+  (when (not mark-active)
+    (error "Mark is not active"))
+  (let* ((isearch-bounds (list isearch-other-end (point)))
+         (ismin (apply 'min isearch-bounds))
+         (ismax (apply 'max isearch-bounds))
+         )
+    (if (< (mark) ismin)
+        (kill-region (mark) ismin)
+      (if (> (mark) ismax)
+          (kill-region ismax (mark))
+        (error "Internal error in isearch kill function.")))
+    (isearch-exit)
+    ))
+
+(define-key isearch-mode-map [(meta z)] 'zap-to-isearch)
+
+
+;; http://www.emacswiki.org/emacs/ZapToISearch
+(defun isearch-exit-other-end (rbeg rend)
+  "Exit isearch, but at the other end of the search string.
+This is useful when followed by an immediate kill."
+  (interactive "r")
+  (isearch-exit)
+  (goto-char isearch-other-end))
+
+(define-key isearch-mode-map [(control return)] 'isearch-exit-other-end)
+
+#+END_SRC
+
+** Grep
+ grep settings
+#+BEGIN_SRC emacs-lisp :tangle yes
+(setq-default grep-highlight-matches t
+grep-scroll-output t)
+(setq-default locate-command "mdfind") ; because i use a mac
+#+END_SRC
+
+** ibuffer
+This is all steve purcell's emacs
+#+BEGIN_SRC emacs-lisp :tangle yes
+;; TODO: enhance ibuffer-fontification-alist
+;;   See http://www.reddit.com/r/emacs/comments/21fjpn/fontifying_buffer_list_for_emacs_243/
+
+(fullframe ibuffer ibuffer-quit)
+(require 'ibuffer-vc)
+
+(defun ibuffer-set-up-preferred-filters ()
+  (ibuffer-vc-set-filter-groups-by-vc-root)
+  (unless (eq ibuffer-sorting-mode 'filename/process)
+    (ibuffer-do-sort-by-filename/process)))
+
+(add-hook 'ibuffer-hook 'ibuffer-set-up-preferred-filters)
+
+(setq-default ibuffer-show-empty-filter-groups nil)
+
+
+;; Use human readable Size column instead of original one
+(define-ibuffer-column size-h
+  (:name "Size" :inline t)
+    (cond
+     ((> (buffer-size) 1000000) (format "%7.1fM" (/ (buffer-size) 1000000.0)))
+     ((> (buffer-size) 1000) (format "%7.1fk" (/ (buffer-size) 1000.0)))
+     (t (format "%8d" (buffer-size)))))
+
+
+;; Explicitly require ibuffer-vc to get its column definitions, which
+;; can't be autoloaded
+(require 'ibuffer-vc)
+
+;; Modify the default ibuffer-formats (toggle with `)
+(setq ibuffer-formats
+      '((mark modified read-only vc-status-mini " "
+              (name 18 18 :left :elide)
+              " "
+              (size-h 9 -1 :right)
+              " "
+              (mode 16 16 :left :elide)
+              " "
+              filename-and-process)
+        (mark modified read-only vc-status-mini " "
+              (name 18 18 :left :elide)
+              " "
+              (size-h 9 -1 :right)
+              " "
+              (mode 16 16 :left :elide)
+              " "
+              (vc-status 16 16 :left)
+              " "
+              filename-and-process)))
+
+(setq ibuffer-filter-group-name-face 'font-lock-doc-face)
+
+(global-set-key (kbd "C-x C-b") 'ibuffer)
+
+#+END_SRC
+** Autocomplete
+mostly purchell's autocomplete
+#+BEGIN_SRC emacs-lisp :tangle yes
+(require 'auto-complete)
+(require 'auto-complete-config)
+(global-auto-complete-mode t)
+(setq-default ac-expand-on-auto-complete nil)
+(setq-default ac-auto-start nil)
+(setq-default ac-dwim nil) ; to get pop-ups with docs even if a word is uniquely completed
+(setq tab-always-indent 'complete)
+(add-to-list 'completion-styles 'initials t)
+;; Stop completion-at-point from popping up completion buffers so eagerly
+;;(setq completion-cycle-threshold 5)
+;;(add-hook 'auto-complete-mode-hook 'set-auto-complete-as-completion-at-point-function)
+
+
+;;(set-default 'ac-sources
+;;             '(ac-source-imenu
+;;               ac-source-dictionary
+;;              ac-source-words-in-buffer
+;;               ac-source-words-in-same-mode-buffers
+;;               ac-source-words-in-all-buffer))
+
+;;(dolist (mode '(magit-log-edit-mode
+;;                log-edit-mode org-mode text-mode haml-mode
+;;                git-commit-mode
+;;                sass-mode yaml-mode csv-mode espresso-mode haskell-mode
+;;                html-mode nxml-mode sh-mode smarty-mode clojure-mode
+;;                lisp-mode textile-mode markdown-mode tuareg-mode
+;;                js3-mode css-mode less-css-mode sql-mode
+;;                sql-interactive-mode
+;;                inferior-emacs-lisp-mode))
+;;  (add-to-list 'ac-modes mode))
+
+#+END_SRC
+** Windows
+windowing configuration
+winner-mode navigates window layouts with "C-c <left>" and "C-c <right>"
+#+BEGIN_SRC emacs-lisp :tangle yes
+(winner-mode 1)
+(require 'switch-window)
+(setq switch-window-shortcut-style 'alphabet)
+(global-set-key (kbd "C-x o") 'switch-window)
+
+#+END_SRC
+
+** Fonts
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(require 'default-text-scale)
+(global-set-key (kbd "C-x +") 'default-text-scale-increase)
+(global-set-key (kbd "C-x -") 'default-text-scale-decrease)
+
+#+END_SRC
+
+** MMM Mode
+multiple major modes
+#+BEGIN_SRC emacs-lisp :tangle yes
+(setq mmm-global-mode 'buffers-with-submode-classes)
+(setq mmm-submode-decoration-level 2)
+#+END_SRC
+
+** git config
+magit, git-blame, gitignore-mode, gitconfig-mode, git-messenger, git-timemachine
+#+BEGIN_SRC emacs-lisp :tangle yes
+(require 'magit)
+(require 'git-blame)
+(require 'gitignore-mode)
+(require 'gitconfig-mode)
+(require 'git-messenger) ;; Though see also vc-annotate's "n" & "p" bindings
+(require 'git-timemachine)
+
+(setq-default
+ magit-save-some-buffers nil
+ magit-process-popup-time 10
+ magit-diff-refine-hunk t
+ magit-completing-read-function 'magit-ido-completing-read)
+
+;; Hint: customize `magit-repo-dirs' so that you can use C-u M-F12 to
+;; quickly open magit on any one of your projects.
+(global-set-key [(meta f12)] 'magit-status)
+
+(define-key magit-status-mode-map (kbd "C-M-<up>") 'magit-goto-parent-section)
+
+(fullframe magit-status magit-mode-quit-window)
+
+(add-hook 'git-commit-mode-hook 'goto-address-mode)
+
+;;; When we start working on git-backed files, use git-wip if available
+
+(when (executable-find magit-git-executable)
+  (global-magit-wip-save-mode)
+  (diminish 'magit-wip-save-mode))
+
+(diminish 'magit-auto-revert-mode)
+(add-hook 'magit-mode-hook (lambda () (local-unset-key [(meta h)])))
+
+;; Convenient binding for vc-git-grep
+(global-set-key (kbd "C-x v f") 'vc-git-grep)
+(setq magit-last-seen-setup-instructions "1.4.0")
+
+(global-set-key (kbd "C-x v p") #'git-messenger:popup-message)
+
+(require 'yagist)
+(require 'github-browse-file)
+(require 'bug-reference-github)
+(add-hook 'prog-mode-hook 'bug-reference-prog-mode)
+
+(require 'github-clone)
+;;(require 'magit-gh-pulls)
+
+#+END_SRC
+
+** js2
+javascript and other nonsense
+#+BEGIN_SRC emacs-lisp :tangle yes
+
+(defcustom preferred-javascript-mode
+  (first (remove-if-not #'fboundp '(js2-mode js-mode)))
+  "Javascript mode to use for .js files."
+  :type 'symbol
+  :group 'programming
+  :options '(js2-mode js-mode))
+(defvar preferred-javascript-indent-level 2)
+
+;; Need to first remove from list if present, since elpa adds entries too, which
+;; may be in an arbitrary order
+(eval-when-compile (require 'cl))
+(setq auto-mode-alist (cons `("\\.js\\(\\.erb\\)?\\'" . ,preferred-javascript-mode)
+                            (loop for entry in auto-mode-alist
+                                  unless (eq preferred-javascript-mode (cdr entry))
+                                  collect entry)))
+
+
+;; js2-mode
+(setq-default
+ js2-basic-offset preferred-javascript-indent-level
+ js2-bounce-indent-p nil)
+
+(js2-imenu-extras-setup)
+
+;; js-mode
+(setq-default js-indent-level preferred-javascript-indent-level)
+
+(add-to-list 'interpreter-mode-alist (cons "node" preferred-javascript-mode))
+
+;; Javascript nests {} and () a lot, so I find this helpful
+
+(require 'rainbow-delimiters)
+(dolist (hook '(js2-mode-hook js-mode-hook json-mode-hook))
+  (add-hook hook 'rainbow-delimiters-mode))
+
+;;; Coffeescript
+
+(setq coffee-js-mode preferred-javascript-mode
+  coffee-tab-width preferred-javascript-indent-level)
+
+(when (fboundp 'coffee-mode)
+  (add-to-list 'auto-mode-alist '("\\.coffee\\.erb\\'" . coffee-mode)))
+
+;; ---------------------------------------------------------------------------
+;; Run and interact with an inferior JS via js-comint.el
+;; ---------------------------------------------------------------------------
+
+(setq inferior-js-program-command "js")
+
+(defvar inferior-js-minor-mode-map (make-sparse-keymap))
+(define-key inferior-js-minor-mode-map "\C-x\C-e" 'js-send-last-sexp)
+(define-key inferior-js-minor-mode-map "\C-\M-x" 'js-send-last-sexp-and-go)
+(define-key inferior-js-minor-mode-map "\C-cb" 'js-send-buffer)
+(define-key inferior-js-minor-mode-map "\C-c\C-b" 'js-send-buffer-and-go)
+(define-key inferior-js-minor-mode-map "\C-cl" 'js-load-file-and-go)
+
+(define-minor-mode inferior-js-keys-mode
+  "Bindings for communicating with an inferior js interpreter."
+  nil " InfJS" inferior-js-minor-mode-map)
+
+(dolist (hook '(js2-mode-hook js-mode-hook))
+  (add-hook hook 'inferior-js-keys-mode))
+
+#+END_SRC
+** org-mode
+my org-mode config
+#+BEGIN_SRC emacs-lisp :tangle yes
+(setq org-directory "~/Documents/orgs/")
+(setq org-default-notes-file "~/Documents/orgs/.notes")
+(setq remember-annotation-functions '(org-remember-annotation))
+(setq remember-handler-functions '(org-remember-handler))
+(add-hook 'remember-mode-hook 'org-remember-apply-template)
+
+;;templates
+(setq org-capture-templates
+  '(
+    ("t" "Todo" entry (file+headline "~/Documents/orgs/gtd/newgtd.org" "Tasks") "* TODO %^{Brief Description} %^g\n%?\nAdded: %U\n %i\n %a\n\n")
+    ("j" "Journal" entry (file_datetree "~/Documents/orgs/gtd/journal.org") "* %?\Entered on %U\n %i\n %a")
+    ("p" "Project" entry (file+headline "~/Documents/orgs/gtd/newgtd.org" "Projects") "* %^{Brief Description} %^g\n%?\nAdded: %U\n %i\n %a")
+    ("d" "Daily Review" entry (file+headline "~/Documents/orgs/gtd/journal.org" "Daily Review") "** %t :COACH: \n%[~/Documents/orgs/.daily_review.txt]\n")
+    ("s" "Someday" entry (file+headline "~/Documents/orgs/gtd/someday.org" "Someday") "* TODO %^{Brief Description} %^\n%?\nAdded: %U\n %i\n %a\n\n")
+    ))
+
+;; settings
+(setq org-src-fontify-natively t)
+(setq org-log-done t)
+(setq org-log-repeat "time")
+(setq org-agenda-include-diary nil)
+(setq org-deadline-warning-days 7)
+(setq org-timeline-show-empty-dates t)
+(setq org-insert-mode-line-in-empty-file t)
+
+;; refile settings
+(setq org-refile-targets
+      (quote
+       (
+        ("~/Documents/orgs/gtd/refiled.org" :maxlevel . 1)
+        ("~/Documents/orgs/gtd/someday.org" :level . 1)
+        ("~/Documents/orgs/gtd/follow_up.org" :level . 1)
+       )
+      )
+      )
+
+(setq org-agenda-files
+ (quote
+  (
+   "~/Documents/orgs/gtd/newgtd.org"
+   "~/Documents/orgs/gtd/calendar.org"
+   )
+  )
+ )
+#+END_SRC
