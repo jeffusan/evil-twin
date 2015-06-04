@@ -9,3 +9,4 @@ init.el
 ac-comphist.dat
 history
 recentf
+tramp
