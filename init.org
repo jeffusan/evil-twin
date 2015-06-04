@@ -6,11 +6,10 @@
 #+BABEL: :cache yes
 * My emacs config, written in org-babel for emacs.
 This is my emacs configuration in org-babel.
-It is converted to init.el the first time it is loaded, using tangle.
 
 To use this, you can... M-x org-babel-load-file
 
-** TODOs
+** TODO
 - [X] comb through purcell emacs and take out the good parts
 - [X] configure and auto-start a decent theme
 - [X] my org-mode config
@@ -33,43 +32,12 @@ To use this, you can... M-x org-babel-load-file
 - [ ] write some actual documentation for the love of god
 - [X] stop leaving tildas everywhere
 - [ ] end quotes and parens should be added by default
+
 ** Utilities
-I've added some utility functions that can be called via META-x:
-- delete this file
-  This is a shortcut to delete the current buffer and kill it.
-- Rename the current file
-  A shortcut to rename and save: both the current buffer and the file it's visiting.
+- reload init.org quick key. This is useful for manually testing changes to init.org
+- require-package this was swiped from Steve Purcell's excellent work.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
-;;----------------------------------------------------------------------------
-;; Delete the current file
-;;----------------------------------------------------------------------------
-(defun delete-this-file ()
-  "Delete the current file, and kill the buffer."
-  (interactive)
-  (or (buffer-file-name) (error "No file is currently being edited"))
-  (when (yes-or-no-p (format "Really delete '%s'?"
-                             (file-name-nondirectory buffer-file-name)))
-    (delete-file (buffer-file-name))
-    (kill-this-buffer)))
-
-;;----------------------------------------------------------------------------
-;; Rename the current file
-;;----------------------------------------------------------------------------
-(defun rename-this-file-and-buffer (new-name)
-  "Renames both current buffer and file it's visiting to NEW-NAME."
-  (interactive "sNew name: ")
-  (let ((name (buffer-name))
-        (filename (buffer-file-name)))
-    (unless filename
-      (error "Buffer '%s' is not visiting a file!" name))
-    (if (get-buffer new-name)
-        (message "A buffer named '%s' already exists!" new-name)
-      (progn
-        (when (file-exists-p filename)
-         (rename-file filename new-name 1))
-        (rename-buffer new-name)
-        (set-visited-file-name new-name)))))
 
 ;;------------------
 ;; Reload org config
