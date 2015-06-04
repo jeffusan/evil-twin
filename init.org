@@ -20,7 +20,7 @@ To use this, you can... M-x org-babel-load-file
 - [ ] add gnus config
 - [X] get my old shortcuts to work
 - [X] get osx alt key to work
-- [ ] find a better font
+- [X] find a better font
 - [ ] add purcell tls stuff
 - [ ] review to understand the search functionality
 - [ ] review ibuffer settings
@@ -31,6 +31,8 @@ To use this, you can... M-x org-babel-load-file
 - [ ] figure out the ibuffer warning on load
 - [ ] why doesn't the start.el work? is it needed?
 - [ ] write some actual documentation for the love of god
+- [X] stop leaving tildas everywhere
+- [ ] end quotes and parens should be added by default
 ** Utilities
 I've added some utility functions that can be called via META-x:
 - delete this file
@@ -213,6 +215,8 @@ Default configuration settings. Other things that don't really deserve a heading
 (require 'csv-nav)
 
 (setq csv-separators '("," ";" "|" " "))
+
+(setq backup-directory-alist `(("." . "~/.emacs_backup_files")))
 
 #+END_SRC
 
