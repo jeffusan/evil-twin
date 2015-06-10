@@ -4,12 +4,7 @@
 #+STARTUP: indent
 #+LANGUAGE: en
 #+BABEL: :cache yes
-* My emacs config, written in org-babel for emacs.
-This is my emacs configuration in org-babel.
-
-To use this, you can... M-x org-babel-load-file
-
-** TODO
+* TODO
 - [X] comb through purcell emacs and take out the good parts
 - [X] configure and auto-start a decent theme
 - [X] my org-mode config
@@ -27,12 +22,21 @@ To use this, you can... M-x org-babel-load-file
 - [ ] review hippie-expand
 - [ ] review purcell init-editing-utils
 - [ ] figure out why you can't load flycheck
-- [ ] automate desktop setup
+- [ ] automate desktop save file
 - [ ] figure out the ibuffer warning on load
-- [ ] why doesn't the start.el work? is it needed?
+- [X] why doesn't the start.el work? is it needed?
 - [ ] write some actual documentation for the love of god
 - [X] stop leaving tildas everywhere
 - [ ] end quotes and parens should be added by default
+- [ ] is there a way to save themes as safe, but not in ~/.emacs?
+
+* My emacs config, written in org-babel for emacs.
+This is my emacs configuration in org-babel.
+
+To use this, you can... M-x org-babel-load-file init.org
+
+Or, you can copy start.el to init.el and start emacs. This will read init.org,
+interpret the source, and write the source to init.el (overwrite itself).
 
 ** Utilities
 - reload init.org quick key. This is useful for manually testing changes to init.org
