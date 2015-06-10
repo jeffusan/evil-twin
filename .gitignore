@@ -10,3 +10,5 @@ ac-comphist.dat
 history
 recentf
 tramp
+.session
+*.elc

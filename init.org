@@ -14,6 +14,7 @@ To use this, you can... M-x org-babel-load-file
 - [X] configure and auto-start a decent theme
 - [X] my org-mode config
 - [ ] ensime
+- [ ] add yaml mode
 - [ ] figure out how to use emmet mode
 - [ ] cider
 - [ ] add gnus config
@@ -167,7 +168,7 @@ Default configuration settings. Other things that don't really deserve a heading
   (toggle-read-only))
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 (load-theme 'wombat t)
-(add-hook 'after-init-hook 'global-flycheck-mode)
+;(add-hook 'after-init-hook 'global-flycheck-mode)
 (global-set-key (kbd "M-/") 'hippie-expand)
 
 (setq hippie-expand-try-functions-list
@@ -717,6 +718,9 @@ save a list of open files in ~/.emacs.d/.emacs.desktop
 (defadvice desktop-read (around trace-desktop-errors activate)
   (let ((debug-on-error t))
     ad-do-it))
+
+(defun sanityinc/time-subtract-millis (b a)
+  (* 1000.0 (float-time (time-subtract b a))))
 
 (defadvice desktop-read (around time-restore activate)
     (let ((start-time (current-time)))
