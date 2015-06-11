@@ -27,7 +27,7 @@
 - [X] why doesn't the start.el work? is it needed?
 - [ ] write some actual documentation for the love of god
 - [X] stop leaving tildas everywhere
-- [ ] end quotes and parens should be added by default
+- [X] end quotes and parens should be added by default
 - [ ] is there a way to save themes as safe, but not in ~/.emacs?
 
 * My emacs config, written in org-babel for emacs.
@@ -240,18 +240,12 @@ Mostly disabling things I don't want or need
 
 #+END_SRC
 ** mostly paredit
-Straight-up justinabrahams lisp config
-...
-eldoc mode is will update your minibuffer to show the parameters the
-function under your cursor takes, which can be a helpful for jogging
-your memory.
+Switched this to purcell emacs
 
 #+begin_src emacs-lisp :tangle yes
-(require 'paredit)
+(require-package 'paredit)
 (autoload 'enable-paredit-mode "paredit")
-(eval-after-load 'paredit
-  ;; need a binding that works in the terminal
-  '(define-key paredit-mode-map (kbd "M-)") 'paredit-forward-slurp-sexp))
+
 (defun maybe-map-paredit-newline ()
   (unless (or (memq major-mode '(inferior-emacs-lisp-mode cider-repl-mode))
               (minibufferp))
@@ -259,9 +253,10 @@ your memory.
 
 (add-hook 'paredit-mode-hook 'maybe-map-paredit-newline)
 
+(diminish 'paredit-mode " Par")
 (dolist (binding (list (kbd "C-<left>") (kbd "C-<right>")
-                         (kbd "C-M-<left>") (kbd "C-M-<right>")))
-  (define-key paredit-mode-map binding nil))
+                       (kbd "C-M-<left>") (kbd "C-M-<right>")))
+    (define-key paredit-mode-map binding nil))
 
 ;; Disable kill-sentence, which is easily confused with the kill-sexp
 ;; binding, but doesn't preserve sexp structure
@@ -292,18 +287,10 @@ your memory.
 ;; Enable some handy paredit functions in all prog modes
 ;; ----------------------------------------------------------------------------
 
-(require 'paredit-everywhere)
+(require-package 'paredit-everywhere)
 (add-hook 'prog-mode-hook 'paredit-everywhere-mode)
+(add-hook 'css-mode-hook 'paredit-everywhere-mode)
 
-
-(show-paren-mode 1)  ;; highlight matching parenthasis
-(add-hook 'emacs-lisp-mode-hook 'paredit-mode)
-
-;; nifty documentation at point for lisp files
-(add-hook 'emacs-lisp-mode-hook 'turn-on-eldoc-mode)
-(add-hook 'lisp-interaction-mode-hook 'turn-on-eldoc-mode)
-(add-hook 'ielm-mode-hook 'turn-on-eldoc-mode)
-(diminish 'paredit-mode " Par")
 #+END_SRC
 ** iSearch
 anzu mode
