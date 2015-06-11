@@ -12,3 +12,4 @@ recentf
 tramp
 .session
 *.elc
+ensime/

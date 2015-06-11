@@ -137,7 +137,9 @@ idomenu
 coffee-mode
 osx-location
 js-comint
-paredit)
+paredit
+exec-path-from-shell
+ensime)
 "A list of packages to be installed at launch.")
 
 (dolist (p my-packages)
@@ -191,6 +193,7 @@ Default configuration settings. Other things that don't really deserve a heading
 
 (setq backup-directory-alist `(("." . "~/.emacs_backup_files")))
 
+(exec-path-from-shell-initialize)
 #+END_SRC
 
 *** Ido configuration settings
@@ -690,7 +693,15 @@ sql mode config
 (push 'sql-mode page-break-lines-modes)
 #+END_SRC
 
+** ensime
+scala/ensime configuration
+#+BEGIN_SRC emacs-lisp :tangle yes
+(require 'scala-mode2)
+(require 'ensime)
+(setq ensime-sbt-command "/opt/local/bin/sbt")
+(add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
 
+#+END_SRC
 ** server
 allow access from emacsclient
 #+BEGIN_SRC emacs-lisp :tangle yes
