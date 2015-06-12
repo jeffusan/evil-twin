@@ -139,6 +139,7 @@ osx-location
 js-comint
 paredit
 exec-path-from-shell
+buffer-move
 ensime)
 "A list of packages to be installed at launch.")
 
