@@ -1,3 +1,4 @@
+
 #+title: My Emacs Configuration
 #+AUTHOR: Jeff Hemminger
 #+EMAIL: jeff@kropek.org
@@ -8,7 +9,7 @@
 - [X] comb through purcell emacs and take out the good parts
 - [X] configure and auto-start a decent theme
 - [X] my org-mode config
-- [ ] ensime
+- [X] ensime
 - [ ] add yaml mode
 - [ ] figure out how to use emmet mode
 - [ ] cider
@@ -29,6 +30,8 @@
 - [X] stop leaving tildas everywhere
 - [X] end quotes and parens should be added by default
 - [ ] is there a way to save themes as safe, but not in ~/.emacs?
+- [X] show-paren-mode
+- [ ] fix warning paredit mode is currently not a minor mode
 
 * My emacs config, written in org-babel for emacs.
 This is my emacs configuration in org-babel.
@@ -41,7 +44,7 @@ interpret the source, and write the source to init.el (overwrite itself).
 ** Utilities
 - reload init.org quick key. This is useful for manually testing changes to init.org
 - require-package this was swiped from Steve Purcell's excellent work.
-
+a
 #+BEGIN_SRC emacs-lisp :tangle yes
 
 ;;------------------
@@ -95,7 +98,6 @@ magit
 highlight-quoted
 org
 rainbow-delimiters
-paredit-everywhere
 pastels-on-dark-theme
 afternoon-theme
 ahungry-theme
@@ -138,6 +140,7 @@ coffee-mode
 osx-location
 js-comint
 paredit
+paredit-everywhere
 exec-path-from-shell
 buffer-move
 ensime)
@@ -153,6 +156,7 @@ ensime)
 Default configuration settings. Other things that don't really deserve a heading of their own.
 
 #+BEGIN_SRC emacs-lisp :tangle yes
+(show-paren-mode 1)
 (fset 'yes-or-no-p 'y-or-n-p) ;; only `y` instead of `yes`
 (desktop-save-mode 1) ;; auto-save buffer state on close for next time.
 (setq scroll-bar-mode nil)
@@ -699,7 +703,7 @@ scala/ensime configuration
 #+BEGIN_SRC emacs-lisp :tangle yes
 (require 'scala-mode2)
 (require 'ensime)
-(setq ensime-sbt-command "/opt/local/bin/sbt")
+(setq ensime-sbt-command "/usr/local/bin/sbt")
 (add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
 
 #+END_SRC
