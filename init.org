@@ -10,9 +10,9 @@
 - [X] configure and auto-start a decent theme
 - [X] my org-mode config
 - [X] ensime
-- [ ] add yaml mode
+- [X] add yaml mode
 - [ ] figure out how to use emmet mode
-- [ ] cider
+- [X] cider
 - [ ] add gnus config
 - [X] get my old shortcuts to work
 - [X] get osx alt key to work
@@ -32,6 +32,7 @@
 - [ ] is there a way to save themes as safe, but not in ~/.emacs?
 - [X] show-paren-mode
 - [ ] fix warning paredit mode is currently not a minor mode
+- [ ] Scala files are not automatically associated with ensime-mode
 
 * My emacs config, written in org-babel for emacs.
 This is my emacs configuration in org-babel.
@@ -75,11 +76,12 @@ Add package management repositories
 
 #+BEGIN_SRC emacs-lisp :tangle yes
 (require 'package)
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
-(add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
-;;; Also use Melpa for most packages
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-(add-to-list 'package-archives '("melpa-stable" . "http://stable.melpa.org/packages/"))
+(setq package-archives '(
+  ("org" . "http://orgmode.org/elpa/")
+  ("gnu" . "http://elpa.gnu.org/packages/")
+  ("melpa" . "http://melpa.org/packages/")
+))
+(setq package-check-signature nil)
 (package-initialize)
 #+END_SRC
 
@@ -143,7 +145,9 @@ paredit
 paredit-everywhere
 exec-path-from-shell
 buffer-move
-ensime)
+ensime
+yaml-mode
+cider)
 "A list of packages to be installed at launch.")
 
 (dolist (p my-packages)
@@ -261,7 +265,7 @@ Switched this to purcell emacs
 
 (add-hook 'paredit-mode-hook 'maybe-map-paredit-newline)
 
-(diminish 'paredit-mode " Par")
+;;(diminish 'paredit-mode " Par")
 (dolist (binding (list (kbd "C-<left>") (kbd "C-<right>")
                        (kbd "C-M-<left>") (kbd "C-M-<right>")))
     (define-key paredit-mode-map binding nil))
