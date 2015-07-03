@@ -20,18 +20,17 @@
 - [ ] review to understand the search functionality
 - [ ] review ibuffer settings
 - [ ] review hippie-expand
-- [ ] review purcell init-editing-utils
+- [X] review purcell init-editing-utils
 - [ ] figure out why you can't load flycheck
 - [ ] figure out the ibuffer warning on load
 - [X] why doesn't the start.el work? is it needed?
 - [ ] write some actual documentation for the love of god
 - [X] stop leaving tildas everywhere
 - [X] end quotes and parens should be added by default
-- [ ] is there a way to save themes as safe, but not in ~/.emacs?
 - [X] show-paren-mode
 - [X] fix warning paredit mode is currently not a minor mode
 - [X] Scala files are not automatically associated with ensime-mode
-- [ ] add emacs darcula-theme
+- [X] add emacs darcula-theme
 
 * My emacs config, written in org-babel for emacs.
 This is my emacs configuration in org-babel. 
@@ -152,6 +151,8 @@ exec-path-from-shell
 buffer-move
 ensime
 yaml-mode
+darcula-theme
+multiple-cursors
 cider)
 "A list of packages to be installed at launch.")
 
@@ -192,9 +193,9 @@ Default configuration settings. Other things that don't really deserve a heading
 ")))
   (toggle-read-only))
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
-(load-theme 'wombat t)
+(load-theme 'darcula t
 ;(add-hook 'after-init-hook 'global-flycheck-mode)
-(global-set-key (kbd "M-/") 'hippie-expand)
+(global-set-key (kbd "M-/") 'hippie-expand))
 
 (setq hippie-expand-try-functions-list
       '(try-complete-file-name-partially
@@ -738,7 +739,8 @@ allow access from emacsclient
 #+END_SRC
 ** emmet
 emmet-mode configuration here
-
+1- write the [[https://github.com/smihica/emmet-mode#html-abbreviations][abbreviation]]
+2- C-u C-j to expand it
 #+BEGIN_SRC emacs-lisp :tangle yes
 (require-package 'emmet-mode)
 (add-hook 'sgml-mode-hook 'emmet-mode)
@@ -746,3 +748,43 @@ emmet-mode configuration here
 (add-hook 'css-mode-hook 'emmet-mode)
 
 #+END_SRC
+** sanityinc cool stuff
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+(global-auto-revert-mode)
+(transient-mark-mode t)
+
+(setq-default
+ blink-cursor-delay 0
+ blink-cursor-interval 0.4
+ column-number-mode t
+ grep-highlight-matches t
+ make-backup-files nil)
+
+(defun kill-back-to-indentation ()
+  "Kill from point back to the first non-whitespace character on the line."
+  (interactive)
+  (let ((prev-pos (point)))
+    (back-to-indentation)
+    (kill-region (point) prev-pos)))
+
+(global-set-key (kbd "C-M-<backspace>") 'kill-back-to-indentation)
+
+#+END_SRC
+
+** multiple cursors
+take a look at this 4 minute video if you need to be convinced
+#+BEGIN_SRC emacs-lisp :tangle yes
+(require-package 'multiple-cursors)
+;; multiple-cursors
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-+") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+;; From active region to multiple cursors:
+(global-set-key (kbd "C-c c r") 'set-rectangular-region-anchor)
+(global-set-key (kbd "C-c c c") 'mc/edit-lines)
+(global-set-key (kbd "C-c c e") 'mc/edit-ends-of-lines)
+(global-set-key (kbd "C-c c a") 'mc/edit-beginnings-of-lines)
+#+END_SRC
+
