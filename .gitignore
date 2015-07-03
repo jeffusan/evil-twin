@@ -13,3 +13,4 @@ tramp
 .session
 *.elc
 ensime/
+url/
