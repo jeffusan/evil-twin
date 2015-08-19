@@ -13,7 +13,7 @@
 - [X] figure out how to use emmet mode
 - [X] auto associate emmet with html
 - [X] cider
-- [ ] add gnus config
+- [X] add gnus config
 - [X] get my old shortcuts to work
 - [X] get osx alt key to work
 - [X] find a better font
@@ -787,4 +787,5 @@ take a look at this 4 minute video if you need to be convinced
 (global-set-key (kbd "C-c c e") 'mc/edit-ends-of-lines)
 (global-set-key (kbd "C-c c a") 'mc/edit-beginnings-of-lines)
 #+END_SRC
+
 
