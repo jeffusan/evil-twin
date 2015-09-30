@@ -195,11 +195,11 @@ Default configuration settings. Other things that don't really deserve a heading
     (progn
       (replace-match "
 ")))
-  (toggle-read-only))
+  (read-only-mode)
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
 (load-theme 'darcula t
 ;(add-hook 'after-init-hook 'global-flycheck-mode)
-(global-set-key (kbd "M-/") 'hippie-expand))
+(global-set-key (kbd "M-/") 'hippie-expand)))
 
 (setq hippie-expand-try-functions-list
       '(try-complete-file-name-partially
@@ -218,6 +218,10 @@ Default configuration settings. Other things that don't really deserve a heading
 (setq backup-directory-alist `(("." . "~/.emacs_backup_files")))
 
 (exec-path-from-shell-initialize)
+
+;;; seriously the most annoying functionality ever invented,
+;;; could only have been made by Ruby devs
+(setq ruby-insert-encoding-magic-comment nil)
 #+END_SRC
 
 *** Ido configuration settings
@@ -617,19 +621,16 @@ my org-mode config
 #+BEGIN_SRC emacs-lisp :tangle yes
 (setq org-directory "~/Documents/orgs/")
 (setq org-default-notes-file "~/Documents/orgs/.notes")
-(setq remember-annotation-functions '(org-remember-annotation))
-(setq remember-handler-functions '(org-remember-handler))
-(add-hook 'remember-mode-hook 'org-remember-apply-template)
-
+(define-key global-map "\C-cc" 'org-capture)
 ;;templates
 (setq org-capture-templates
   '(
     ("t" "Todo" entry (file+headline "~/Documents/orgs/gtd/newgtd.org" "Tasks") "* TODO %^{Brief Description} %^g\n%?\nAdded: %U\n %i\n %a\n\n")
     ("j" "Journal" entry (file_datetree "~/Documents/orgs/gtd/journal.org") "* %?\Entered on %U\n %i\n %a")
-    ("p" "Project" entry (file+headline "~/Documents/orgs/gtd/newgtd.org" "Projects") "* %^{Brief Description} %^g\n%?\nAdded: %U\n %i\n %a")
-    ("d" "Daily Review" entry (file+headline "~/Documents/orgs/gtd/journal.org" "Daily Review") "** %t :COACH: \n%[~/Documents/orgs/.daily_review.txt]\n")
+    ("p" "Project" entry (file+headline "~/Documents/orgs/gtd/newgtd.org" "Projects") "* %^{Brief Description} %^g\n%?\nAdded: %U\n %i\n %a")))
+    ("d" "Daily Report" entry (file+headline "~/Documents/orgs/gtd/journal.org" "Daily Report") "* %t Daily Report ジェフ \n%[~/Documents/orgs/.daily_report.txt]\n")
     ("s" "Someday" entry (file+headline "~/Documents/orgs/gtd/someday.org" "Someday") "* TODO %^{Brief Description} %^\n%?\nAdded: %U\n %i\n %a\n\n")
-    ))
+    
 
 ;; settings
 (setq org-src-fontify-natively t)
@@ -742,21 +743,6 @@ emmet-mode configuration here
 
 #+END_SRC
 
-** multiple cursors
-take a look at this 4 minute video if you need to be convinced
-#+BEGIN_SRC emacs-lisp :tangle yes
-(require-package 'multiple-cursors)
-;; multiple-cursors
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-+") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-;; From active region to multiple cursors:
-(global-set-key (kbd "C-c c r") 'set-rectangular-region-anchor)
-(global-set-key (kbd "C-c c c") 'mc/edit-lines)
-(global-set-key (kbd "C-c c e") 'mc/edit-ends-of-lines)
-(global-set-key (kbd "C-c c a") 'mc/edit-beginnings-of-lines)
-#+END_SRC
 ** vagrant-tramp
 convenience package to use tramp with vagrant
 #+BEGIN_SRC emacs-lisp :tangle yes
