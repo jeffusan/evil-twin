@@ -31,7 +31,7 @@
 - [X] fix warning paredit mode is currently not a minor mode
 - [X] Scala files are not automatically associated with ensime-mode
 - [X] add emacs darcula-theme
-- [ ] What the heck is Anzu mode and what is it doing in my emacs config?
+- [X] What the heck is Anzu mode and what is it doing in my emacs config?
 
 * Getting Started
 ;;; M-x org-babel-load-file init.org
@@ -310,6 +310,8 @@ anzu mode
 (diminish 'anzu-mode)
 (global-set-key [remap query-replace-regexp] 'anzu-query-replace-regexp)
 (global-set-key [remap query-replace] 'anzu-query-replace)
+(global-set-key (kbd "M-%") 'anzu-query-replace)
+(global-set-key (kbd "C-M-%") 'anzu-query-replace-regexp)
 ;; Activate occur easily inside isearch
 (define-key isearch-mode-map (kbd "C-o") 'isearch-occur)
 ;; DEL during isearch should edit the search string, not jump back to the previous result
@@ -634,9 +636,9 @@ my org-mode config
   '(
     ("t" "Todo" entry (file+headline "~/Documents/orgs/gtd/newgtd.org" "Tasks") "* TODO %^{Brief Description} %^g\n%?\nAdded: %U\n %i\n %a\n\n")
     ("j" "Journal" entry (file_datetree "~/Documents/orgs/gtd/journal.org") "* %?\Entered on %U\n %i\n %a")
-    ("p" "Project" entry (file+headline "~/Documents/orgs/gtd/newgtd.org" "Projects") "* %^{Brief Description} %^g\n%?\nAdded: %U\n %i\n %a")))
+    ("p" "Project" entry (file+headline "~/Documents/orgs/gtd/newgtd.org" "Projects") "* %^{Brief Description} %^g\n%?\nAdded: %U\n %i\n %a")
     ("d" "Daily Report" entry (file+headline "~/Documents/orgs/gtd/journal.org" "Daily Report") "* %t 【Daily Report】 ジェフ \n%[~/Documents/orgs/.daily_report.txt]\n")
-    ("s" "Someday" entry (file+headline "~/Documents/orgs/gtd/someday.org" "Someday") "* TODO %^{Brief Description} %^\n%?\nAdded: %U\n %i\n %a\n\n")
+    ("s" "Someday" entry (file+headline "~/Documents/orgs/gtd/someday.org" "Someday") "* TODO %^{Brief Description} %^\n%?\nAdded: %U\n %i\n %a\n\n")))
     
 
 ;; settings
