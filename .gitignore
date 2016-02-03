@@ -17,4 +17,4 @@ url/
 *.git/
 custom.el
 .mc-lists.el
-bookmarks/
+bookmarks
