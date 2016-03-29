@@ -106,6 +106,8 @@ Loop over the list of packages and install them.
 
 (defvar my-packages
 '(
+pandoc-mode
+hydra
 auto-complete
 magit
 highlight-quoted
@@ -161,6 +163,7 @@ yaml-mode
 darcula-theme
 multiple-cursors
 vagrant-tramp
+adoc-mode
 cider)
 "A list of packages to be installed at launch.")
 
@@ -628,17 +631,17 @@ javascript and other nonsense
 ** org-mode
 my org-mode config
 #+BEGIN_SRC emacs-lisp :tangle yes
-(setq org-directory "~/Documents/orgs/")
-(setq org-default-notes-file "~/Documents/orgs/.notes")
+(setq org-directory "~/Dropbox/orgs/")
+(setq org-default-notes-file "~/Dropbox/orgs/.notes")
 (define-key global-map "\C-cc" 'org-capture)
 ;;templates
 (setq org-capture-templates
   '(
-    ("t" "Todo" entry (file+headline "~/Documents/orgs/gtd/newgtd.org" "Tasks") "* TODO %^{Brief Description} %^g\n%?\nAdded: %U\n %i\n %a\n\n")
-    ("j" "Journal" entry (file_datetree "~/Documents/orgs/gtd/journal.org") "* %?\Entered on %U\n %i\n %a")
-    ("p" "Project" entry (file+headline "~/Documents/orgs/gtd/newgtd.org" "Projects") "* %^{Brief Description} %^g\n%?\nAdded: %U\n %i\n %a")
-    ("d" "Daily Report" entry (file+headline "~/Documents/orgs/gtd/journal.org" "Daily Report") "* %t 【Daily Report】 ジェフ \n%[~/Documents/orgs/.daily_report.txt]\n")
-    ("s" "Someday" entry (file+headline "~/Documents/orgs/gtd/someday.org" "Someday") "* TODO %^{Brief Description} %^\n%?\nAdded: %U\n %i\n %a\n\n")))
+    ("t" "Todo" entry (file+headline "~/Dropbox/orgs/gtd/newgtd.org" "Tasks") "* TODO %^{Brief Description} %^g\n%?\nAdded: %U\n %i\n %a\n\n")
+    ("j" "Journal" entry (file_datetree "~/Dropbox/orgs/gtd/journal.org") "* %?\Entered on %U\n %i\n %a")
+    ("p" "Project" entry (file+headline "~/Dropbox/orgs/gtd/newgtd.org" "Projects") "* %^{Brief Description} %^g\n%?\nAdded: %U\n %i\n %a")
+    ("d" "Daily Report" entry (file+headline "~/Dropbox/orgs/gtd/journal.org" "Daily Report") "* %t 【Daily Report】 ジェフ \n%[~/Dropbox/orgs/.daily_report.txt]\n")
+    ("s" "Someday" entry (file+headline "~/Dropbox/orgs/gtd/someday.org" "Someday") "* TODO %^{Brief Description} %^\n%?\nAdded: %U\n %i\n %a\n\n")))
     
 
 ;; settings
@@ -654,9 +657,9 @@ my org-mode config
 (setq org-refile-targets
       (quote
        (
-        ("~/Documents/orgs/gtd/refiled.org" :maxlevel . 1)
-        ("~/Documents/orgs/gtd/someday.org" :level . 1)
-        ("~/Documents/orgs/gtd/follow_up.org" :level . 1)
+        ("~/Dropbox/orgs/gtd/refiled.org" :maxlevel . 1)
+        ("~/Dropbox/orgs/gtd/someday.org" :level . 1)
+        ("~/Dropbox/orgs/gtd/follow_up.org" :level . 1)
        )
       )
       )
@@ -664,8 +667,8 @@ my org-mode config
 (setq org-agenda-files
  (quote
   (
-   "~/Documents/orgs/gtd/newgtd.org"
-   "~/Documents/orgs/gtd/calendar.org"
+   "~/Dropbox/orgs/gtd/newgtd.org"
+   "~/Dropbox/orgs/gtd/calendar.org"
    )
   )
  )
