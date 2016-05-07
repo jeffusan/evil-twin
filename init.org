@@ -122,7 +122,6 @@ dired-single
 dired+
 dired-sort
 sql-indent
-js2-mode
 anzu
 diminish
 fullframe
@@ -149,11 +148,9 @@ magit-gh-pulls
 markdown-mode
 csv-nav
 json-mode
-ac-js2
 idomenu
 coffee-mode
 osx-location
-js-comint
 paredit
 paredit-everywhere
 exec-path-from-shell
@@ -476,11 +473,11 @@ mostly purchell's autocomplete
                 sass-mode yaml-mode csv-mode espresso-mode haskell-mode
                 html-mode nxml-mode sh-mode smarty-mode clojure-mode
                 lisp-mode textile-mode markdown-mode tuareg-mode
-                js3-mode css-mode less-css-mode sql-mode
+                css-mode less-css-mode sql-mode
                 sql-interactive-mode
-                inferior-emacs-lisp-mode))
-(add-to-list 'ac-modes mode))
-#+END_SRC
+                inferior-emacs-lisp-mode
+(add-to-list 'ac-modes mode)
+#+END_SRC)))
 ** Windows
 windowing configuration
 winner-mode navigates window layouts with "C-c <left>" and "C-c <right>"
@@ -691,5 +688,5 @@ emmet-mode configuration here
 convenience package to use tramp with vagrant
 #+BEGIN_SRC emacs-lisp :tangle yes
 (eval-after-load 'tramp
-  '(vagrant-tramp-enable))
+  '(vagrant-tramp-add-method))
 #+END_SRC
