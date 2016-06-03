@@ -636,10 +636,10 @@ sql mode config
 ** ensime
 scala/ensime configuration
 #+BEGIN_SRC emacs-lisp :tangle yes
-(require 'scala-mode2)
-(require 'ensime)
-(setq ensime-sbt-command "/usr/local/bin/sbt")
-(add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
+;(require 'scala-mode2)
+;(require 'ensime)
+;(setq ensime-sbt-command "/usr/local/bin/sbt")
+;(add-hook 'scala-mode-hook 'ensime-scala-mode-hook)
 
 #+END_SRC
 ** server
