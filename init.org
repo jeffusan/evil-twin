@@ -15,7 +15,10 @@
 * Getting Started
 
 *** Lightning-fast quick-start
-;;; M-x org-babel-load-file init.org
+
+#+BEGIN_SRC emacs-lisp
+M-x org-babel-load-file init.org
+#+END_SRC
 
 *** My setup: init.el
 I instruct init.el to babel-load my init.org file, and load a theme.
@@ -26,6 +29,7 @@ It may not be the fastest way to do it, but I haven't found it to be an issue.
 #+END_SRC
 
 * My emacs config, written in org-babel for emacs.
+
 This is my emacs configuration in org-babel. 
 
 ** Attributions
@@ -38,38 +42,6 @@ My first use of gnus is directly attributable to his
 
 If there is anything you find useful in this configuration, it is undoubtedly from one of those
 guys.
-
-To use this, you can... M-x org-babel-load-file init.org
-
-M-p is a shortcut for the above.
-
-Or, you can copy start.el to init.el and start emacs. This will read init.org,
-interpret the source, and write the source to init.el (overwrite itself).
-
-** Utilities
-- reload init.org quick key. This is useful for manually testing changes to init.org
-- require-package this was swiped from Steve Purcell's excellent work.
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-
-(global-set-key (kbd "M-p") 
-  (lambda () 
-    (interactive) 
-    (org-babel-load-file "~/.emacs.d/init.org")))
-
-(defun require-package (package &optional min-version no-refresh)
-  "Install given PACKAGE, optionally requiring MIN-VERSION.
-If NO-REFRESH is non-nil, the available package lists will not be
-re-downloaded in order to locate PACKAGE."
-  (if (package-installed-p package min-version)
-      t
-    (if (or (assoc package package-archive-contents) no-refresh)
-        (package-install package)
-      (progn
-        (package-refresh-contents)
-        (require-package package min-version t)))))
-
-#+END_SRC
 
 ** Package Management
 
