@@ -4,7 +4,8 @@
 #+STARTUP: indent
 #+LANGUAGE: en
 #+BABEL: :cache yes
-* TODO
+
+** TODO
 - [ ] review to understand the search functionality
 - [ ] review ibuffer settings
 - [ ] review hippie-expand
