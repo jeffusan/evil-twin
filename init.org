@@ -5,36 +5,24 @@
 #+LANGUAGE: en
 #+BABEL: :cache yes
 * TODO
-- [X] comb through purcell emacs and take out the good parts
-- [X] configure and auto-start a decent theme
-- [X] my org-mode config
-- [X] ensime
-- [X] add yaml mode
-- [X] figure out how to use emmet mode
-- [X] auto associate emmet with html
-- [X] cider
-- [X] add gnus config
-- [X] get my old shortcuts to work
-- [X] get osx alt key to work
-- [X] find a better font
 - [ ] review to understand the search functionality
 - [ ] review ibuffer settings
 - [ ] review hippie-expand
-- [X] review purcell init-editing-utils
 - [ ] figure out why you can't load flycheck
 - [ ] figure out the ibuffer warning on load
-- [X] why doesn't the start.el work? is it needed?
-- [X] write some actual documentation for the love of god
-- [X] stop leaving tildas everywhere
-- [X] end quotes and parens should be added by default
-- [X] show-paren-mode
-- [X] fix warning paredit mode is currently not a minor mode
-- [X] Scala files are not automatically associated with ensime-mode
-- [X] add emacs darcula-theme
-- [X] What the heck is Anzu mode and what is it doing in my emacs config?
 
 * Getting Started
+
+*** Lightning-fast quick-start
 ;;; M-x org-babel-load-file init.org
+
+*** My setup: init.el
+I instruct init.el to babel-load my init.org file, and load a theme.
+It may not be the fastest way to do it, but I haven't found it to be an issue.
+#+BEGIN_SRC emacs-lisp
+(org-babel-load-file "~/evil-twin/init.org")
+(load-theme 'tsdh-light)
+#+END_SRC
 
 * My emacs config, written in org-babel for emacs.
 This is my emacs configuration in org-babel. 
@@ -92,6 +80,7 @@ Add package management repositories
   ("org" . "http://orgmode.org/elpa/")
   ("gnu" . "http://elpa.gnu.org/packages/")
   ("melpa" . "http://melpa.org/packages/")
+  ("marmalade" . "https://marmalade-repo.org/packages/")
 ))
 (setq package-check-signature nil)
 (package-initialize)
@@ -175,8 +164,8 @@ Default configuration settings. Other things that don't really deserve a heading
 
 #+BEGIN_SRC emacs-lisp :tangle yes
 
-(setq custom-file "~/.emacs.d/custom.el")
-(load custom-file)
+;(setq custom-file "~/.emacs.d/custom.el")
+;(load custom-file)
 (setq magit-auto-revert-mode nil)
 (show-paren-mode 1)
 
