@@ -32,6 +32,33 @@ It may not be the fastest way to do it, but I haven't found it to be an issue.
 
 This is my emacs configuration in org-babel. 
 
+** Utilities
+
+- reload init.org quick key. This is useful for manually testing changes to init.org
+- require-package this was swiped from Steve Purcell's excellent work.
+require-package is used extensively throughout this config.
+
+#+BEGIN_SRC emacs-lisp :tangle yes
+
+(global-set-key (kbd "M-p") 
+  (lambda () 
+    (interactive) 
+    (org-babel-load-file "~/Source/evil-twin/init.org")))
+
+(defun require-package (package &optional min-version no-refresh)
+  "Install given PACKAGE, optionally requiring MIN-VERSION.
+If NO-REFRESH is non-nil, the available package lists will not be
+re-downloaded in order to locate PACKAGE."
+  (if (package-installed-p package min-version)
+      t
+    (if (or (assoc package package-archive-contents) no-refresh)
+        (package-install package)
+      (progn
+        (package-refresh-contents)
+        (require-package package min-version t)))))
+
+#+END_SRC
+
 ** Attributions
 I have used [[http://www.sanityinc.com/][Steve Purcell]]'s [[https://github.com/purcell/emacs.d][config]] for over a year.
 Prior to that I was a long-time user of [[https://justin.abrah.ms/][Justin Abraham]]'s [[https://github.com/justinabrahms/.emacs.d][emacs config]]. 
@@ -122,8 +149,7 @@ yaml-mode
 darcula-theme
 multiple-cursors
 vagrant-tramp
-adoc-mode
-cider)
+adoc-mode)
 "A list of packages to be installed at launch.")
 
 (dolist (p my-packages)
@@ -652,3 +678,4 @@ convenience package to use tramp with vagrant
 (eval-after-load 'tramp
   '(vagrant-tramp-add-method))
 #+END_SRC
+
