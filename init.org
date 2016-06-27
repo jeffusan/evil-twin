@@ -104,7 +104,6 @@ org
 rainbow-delimiters
 pastels-on-dark-theme
 afternoon-theme
-ahungry-theme
 alect-themes
 page-break-lines
 dired-single
@@ -128,7 +127,6 @@ gitignore-mode
 gitconfig-mode
 git-messenger
 git-timemachine
-github-browse-file
 yagist
 github-browse-file
 bug-reference-github
@@ -138,7 +136,6 @@ markdown-mode
 csv-nav
 json-mode
 idomenu
-coffee-mode
 osx-location
 paredit
 paredit-everywhere
@@ -163,8 +160,6 @@ Default configuration settings. Other things that don't really deserve a heading
 
 #+BEGIN_SRC emacs-lisp :tangle yes
 
-;(setq custom-file "~/.emacs.d/custom.el")
-;(load custom-file)
 (setq magit-auto-revert-mode nil)
 (show-paren-mode 1)
 
@@ -185,12 +180,9 @@ Default configuration settings. Other things that don't really deserve a heading
   (while (re-search-forward "\\[2K\\[0G" nil t)
     (progn
       (replace-match "
-")))
-  (read-only-mode)
+"))))
+(read-only-mode)
 (add-hook 'compilation-filter-hook 'colorize-compilation-buffer)
-(load-theme 'darcula t
-;(add-hook 'after-init-hook 'global-flycheck-mode)
-(global-set-key (kbd "M-/") 'hippie-expand)))
 
 (setq hippie-expand-try-functions-list
       '(try-complete-file-name-partially
@@ -214,9 +206,6 @@ Default configuration settings. Other things that don't really deserve a heading
 ;;; could only have been made by Ruby devs
 (setq ruby-insert-encoding-magic-comment nil)
 
-;;; added local load-path for fun and games
-;(add-to-list 'load-path "~/.emacs.d/lisp/selectric-mode")
-;(require 'selectric-mode)
 #+END_SRC
 
 *** Ido configuration settings
@@ -238,18 +227,6 @@ Default configuration settings. Other things that don't really deserve a heading
 ;; http://www.reddit.com/r/emacs/comments/21a4p9/use_recentf_and_ido_together/cgbprem
 (add-hook 'ido-setup-hook (lambda () (define-key ido-completion-map [up] 'previous-history-element)))
 (setq ido-use-faces nil)  ;; use flx highlights instead
-#+END_SRC
-
-*** Font work
-TBD
-
-** OSX configuration
-
-#+BEGIN_SRC emacs-lisp :tangle yes
-(setq mac-command-modifier 'meta)
-(setq mac-option-modifier 'none)
-(setq default-input-method "MacOSX")
-
 #+END_SRC
 
 ** GUI Feature
