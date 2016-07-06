@@ -123,6 +123,9 @@ Default configuration settings. Other things that don't really deserve a heading
 ;; Automatically update unmodified buffers whose files have changed.
 (global-auto-revert-mode 1)
 
+(setq backup-directory-alist
+      `(("." . ,(expand-file-name (concat "~/.emacs.d" "bak")))))
+
 #+END_SRC
 
 *** Load Theme
