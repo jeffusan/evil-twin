@@ -13,6 +13,7 @@
 - [X] figure out the ibuffer warning on load
 - [ ] emacs doesn't need to be on top all the time
 - [ ] leaves backup file kruft everywhere
+- [ ] add helm
 
 * Preamble
 
@@ -238,6 +239,8 @@ Highlight matching braces.
 
 Company-mode and associations
 
+- Use C-\ to activate the Company autocompleter.
+
 #+BEGIN_SRC emacs-lisp :tangle yes
 (use-package company
   :demand t
@@ -281,7 +284,7 @@ Company-mode and associations
      (set-face-foreground 'company-tooltip-common "#9a0000")
      (set-face-foreground 'company-tooltip-common-selection "#9a0000")
      (set-face-foreground 'company-tooltip-annotation "#00008e")))
-  ;; Use C-\ to activate the Company autocompleter.
+
   ;; We invoke company-try-hard to gather completion candidates from multiple
   ;; sources if the active source isn't being very forthcoming.
   (use-package company-try-hard
@@ -894,7 +897,9 @@ Learn about Projectile: http://batsov.com/projectile/
 
 #+END_SRC
 ** Git
+
 - Hint: customize `magit-repo-dirs' so that you can use C-u M-F12 to quickly open magit on any one of your projects.
+- C-x g is the quick key for magit-status
 
 #+BEGIN_SRC emacs-lisp :tangle yes
 
@@ -910,8 +915,6 @@ Learn about Projectile: http://batsov.com/projectile/
  magit-process-popup-time 10
  magit-diff-refine-hunk t
  magit-completing-read-function 'magit-ido-completing-read)
-
-(global-set-key [(meta f12)] 'magit-status)
 
 (add-hook 'git-commit-mode-hook 'goto-address-mode)
 
