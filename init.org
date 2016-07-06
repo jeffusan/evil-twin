@@ -81,6 +81,8 @@ Add [[https://github.com/Malabarba/paradox][Paradox]].
 
 Default configuration settings. Other things that don't really deserve a heading of their own.
 
+- C-c w to clean up whitespace
+
 #+BEGIN_SRC emacs-lisp :tangle yes
 (fset 'yes-or-no-p 'y-or-n-p)
 
@@ -97,8 +99,8 @@ Default configuration settings. Other things that don't really deserve a heading
   (mouse-wheel-mode t)
   (blink-cursor-mode -1))
 
-;;; seriously the most annoying functionality ever invented,
-;;; could only have been made by Ruby devs
+;; seriously the most annoying functionality ever invented,
+;; could only have been made by Ruby devs
 (setq ruby-insert-encoding-magic-comment nil)
 
 (set-default 'indent-tabs-mode nil)
@@ -113,7 +115,7 @@ Default configuration settings. Other things that don't really deserve a heading
   :commands global-ethan-wspace-mode
   :config
   (global-ethan-wspace-mode 1)
-  :bind ("C-c c" . ethan-wspace-clean-all)
+  :bind ("C-c w" . ethan-wspace-clean-all)
   :diminish ethan-wspace-mode)
 
 
