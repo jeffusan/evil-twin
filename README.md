@@ -1,3 +1,1 @@
-Because, Github!
-
-Everyone else, just read [the init.org](https://github.com/jeffusan/evil-twin/blob/master/init.org)
+[This is what you are looking for](https://github.com/jeffusan/evil-twin/blob/master/init.org)
